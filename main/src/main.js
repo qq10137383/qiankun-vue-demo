@@ -18,6 +18,7 @@ new Vue({
   render: h => h(App)
 }).$mount("#app");
 
+// 基座是history模式，两个子项目是hash模式和history模式
 registerMicroApps([
   { 
     name: 'app-vue-hash', 
@@ -35,4 +36,5 @@ registerMicroApps([
   },
 ]);
 
+// 启动qiankun，默认是单实例，proxy沙箱
 start();
