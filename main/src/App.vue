@@ -17,14 +17,15 @@
         >
         </el-tab-pane>
       </el-tabs>
-      <!-- 循环生成容器，每一个微应用使用独立的容器，自己控制微应用的显隐 -->
+      <!-- 循环生成容器，每一个微应用使用独立的容器，自己控制微应用的显隐，
+       子应用通过loadMicroApp手动加载，加载后渲染到生成的容器 -->
       <div 
         v-for="item in microApps" 
         :key="item.name" 
         :id="item.container.slice(1)" 
         v-show="$route.path.startsWith(item.prefixPath)"
       ></div>
-      <!-- 缓存主应用的路由 -->
+      <!-- 缓存主应用的路由，主应用的路由渲染在此 -->
       <keep-alive>
         <router-view></router-view>
       </keep-alive>
@@ -34,7 +35,7 @@
 
 <script>
 import { loadMicroApp, initGlobalState } from 'qiankun';
-// 初始化 state
+// 初始化 state，消息通信，创建的state会已props的形式传给子应用，子应用调用onGlobalStateChange接收消息
 const actions = initGlobalState({});
 export default {
   data() {
@@ -76,6 +77,7 @@ export default {
         const microApp = this.microApps.find(item => indexPath.includes(item.prefixPath));
         if (microApp) {
           const childRoutePath = indexPath.replace(microApp.prefixPath,'');
+          // 子应用未加载则手动加载
           if (!this.loadedApp[microApp.name]) {
             const app = loadMicroApp(microApp); // 多了个参数 prefixPath，但是可以忽略
             this.loadedApp[microApp.name] = {
@@ -85,9 +87,10 @@ export default {
           }
           // 如果子应用已加载，将子应用的路由纪录到数组中，并通知子应用增加 keep-alive 的 include
           this.loadedApp[microApp.name].childRoute.push(childRoutePath);
+          // 通知子应用路由已加载，更新keep-alive的include缓存组件
           actions.setGlobalState(this.loadedApp);
         }
-        // 添加 tab 纪录
+        // 添加 tab 纪录，增加tab并选中
         const selectMenu = this.menuData.find(item => item.value === indexPath);
         if(selectMenu){
           this.allTabs.push(selectMenu);
@@ -101,15 +104,18 @@ export default {
       if (microApp) {
         // 移除子应用已缓存的应用
         const childRoutePath = tab.replace(microApp.prefixPath,'');
+        // 移除路由
         const childRouteIndex = this.loadedApp[microApp.name].childRoute.indexOf(childRoutePath);
         this.loadedApp[microApp.name].childRoute.splice(childRouteIndex, 1);
+        // 通知子应用更新keep-alive include
         actions.setGlobalState(this.loadedApp);
-        // 再当前微应用的页面是否已全部关闭
+        // 再当前微应用的页面是否已全部关闭，全部关闭则卸载子应用
         if (this.loadedApp[microApp.name].childRoute.length === 0) {
           this.loadedApp[microApp.name].app.unmount();
           this.loadedApp[microApp.name] = null;
         }
       }
+      // 关闭tab
       const deleteTab = this.allTabs.findIndex(item => item.value === tab);
       this.allTabs.splice(deleteTab, 1);
     },
@@ -132,6 +138,7 @@ export default {
     }
   },
   mounted() {
+    // 刷新地址时，子应用需要加载的情况
     this.initTab();
   },
 }

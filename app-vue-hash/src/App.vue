@@ -5,7 +5,7 @@
       <router-link to="/about">About</router-link>
     </div>
     <keep-alive :include="loadedRouteNames">
-      <router-view/>
+      <router-view />
     </keep-alive>
   </div>
 </template>
@@ -14,24 +14,27 @@
 export default {
   data() {
     return {
-      loadedRouteNames: []
-    }
+      loadedRouteNames: [],
+    };
   },
   mounted() {
     if (window.__POWERED_BY_QIANKUN__) {
-      this.parentProps.onGlobalStateChange(state => {
-        const { childRoute } = state['app-vue-hash'];
+      // 主应用通知子应用加载的组件改变，更新子应用keep-alive include
+      this.parentProps.onGlobalStateChange((state) => {
+        const { childRoute } = state["app-vue-hash"];
         // hash 模式需要去掉路由前面的 #/
-        console.log('childRoute', childRoute);
-        const loadedRoutes = childRoute.map(item => this.$router.resolve(item.slice(2)));
-        console.log('loadedRoutes', loadedRoutes);
-        const loadedRouteNames = loadedRoutes.map(item => item.route.name);
-        console.log('loadedRouteNames', loadedRouteNames);
+        console.log("childRoute", childRoute);
+        const loadedRoutes = childRoute.map((item) =>
+          this.$router.resolve(item.slice(2))
+        );
+        console.log("loadedRoutes", loadedRoutes);
+        const loadedRouteNames = loadedRoutes.map((item) => item.route.name);
+        console.log("loadedRouteNames", loadedRouteNames);
         this.loadedRouteNames = loadedRouteNames;
       }, true);
     }
   },
-}
+};
 </script>
 
 <style>
@@ -55,7 +58,7 @@ export default {
 #nav a.router-link-exact-active {
   color: #42b983;
 }
-span{
+span {
   font-weight: bold;
   color: #2c3e50;
   cursor: pointer;

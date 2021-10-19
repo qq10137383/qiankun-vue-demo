@@ -32,6 +32,7 @@ export async function bootstrap() {
 
 export async function mount(props) {
   console.log('props from main framework', props);
+  // 主应用传递的自定义属性挂载在Vue原型链上，render之后子组件都会继承此属性
   Vue.prototype.parentProps = props;
   render(props);
 }
