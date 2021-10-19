@@ -6,14 +6,42 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <!-- 使用unpkg cdn 加载npm模块
+      1、unpkg是一个npm仓库的cdn镜像，可以通过浏览器直接访问npm仓库资源
+      2、https://unpkg.com/package@version 获取npm上指定包(package)指定版本(version)的入口文件，
+         如果在package.json里面指定了unpkg选项，则输出指定的文件内容，否则获取package.json中main、module指定的文件内容
+      3、https://unpkg.com/package@version/  最后多加一个/，会输出npm上指定包(package)指定版本(version)的文件目录，
+         相当于是目录浏览
+      4、https://unpkg.com/package 不指定版本，则获取npm上指定包(package)最新版本(version)的入口文件
+      5、https://unpkg.com/package@version/dist/xxx.js  如果指定了package后面的文件全路径则会直接加载包中指定的文件
+         如element-ui 的样式文件：https://unpkg.com/element-ui/lib/theme-chalk/index.cs
+      6、下面scripts中vue、vuex、vue-router、vue-i18n这几个模块都在package.json里面定义了unpkg，所以直接加载unpkg指定的内容
+         一般模块会导出cmd，umd，ems等类型的模块，只有umd模式是直接可以兼容浏览器中使用的，所以unpkg中指定umd格式的导出
+      7、unpkg是通过浏览器重定向的方式请求到最终的文件，可以看到一个package会发出多个请求，最终请求到目标文件。
+      8、下面scripts中vue、vuex、vue-router、vue-i18n、element-ui加载了umd模式的模块，会在window对象上挂载Vue,Vuex,VueRouter,VueI18n,
+         ELEMENT等对象，在main、app-vue-hash、app-vue-history的vue.config.js中指定了externals，指定了这几个对象的引用，所以这3个
+         应用打包时不再从node_modules输出这几个模块，都是使用window上挂载的这几个对象代替，所以这几个项目都使用了公共的依赖
+         在原型链上挂载对象时要注意相互影响，好处就是减少了打包的体积和运行时的资源消耗。 
+      9、unpkg太慢，国内使用此cdn加速 https://unpkg.zhimg.com/        
+    -->
+    <!--
     <script src="//unpkg.com/vue"></script>
     <script src="//unpkg.com/vuex"></script>
     <script src="//unpkg.com/vue-router"></script>
-    <script src="//unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
+    <script src="//unpkg.com/vue-i18n@8.26.5"></script>
     <script src="//unpkg.com/element-ui"></script>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <script src="//unpkg.com/element-ui/lib/umd/locale/zh-CN.js"></script>
-    <script src="//unpkg.com/element-ui/lib/umd/locale/en.js"></script>
+    <script src="//unpkg.com/element-ui/lib/umd/locale/en.js"></script> 
+    -->
+    <script src="//unpkg.zhimg.com/vue"></script>
+    <script src="//unpkg.zhimg.com/vuex"></script>
+    <script src="//unpkg.zhimg.com/vue-router"></script>
+    <script src="//unpkg.zhimg.com/vue-i18n@8.26.5"></script>
+    <script src="//unpkg.zhimg.com/element-ui"></script>
+    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="//unpkg.zhimg.com/element-ui/lib/umd/locale/zh-CN.js"></script>
+    <script src="//unpkg.zhimg.com/element-ui/lib/umd/locale/en.js"></script> 
   </head>
   <body>
     <noscript>
